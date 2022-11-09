@@ -7,43 +7,30 @@ import { grey } from '@mui/material/colors';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Usuarios from './components/usuarios/usuarios';
 import Pessoas from './components/pessoas/pessoas';
+import Contatos from './components/contatos/contatos';
 
 function App() {
-	const theme = createTheme({
-		palette: {
-			primary: { main: '#CF2E2E' },
-		},
-	});
-	return (
-		<>
-			<ThemeProvider theme={theme}>
-				<div className="App">
-					<Routes>
-						<Route
-							path="/home"
-							element={<LandingPage />}
-						/>
-						<Route
-							path="/"
-							element={<LoginPage />}
-						/>
-						<Route
-							path="/meu-cadastro"
-							element={<MeuCadastro />}
-						/>
-						<Route
-							path="/usuarios"
-							element={<Usuarios />}
-						/>
-						<Route
-							path="/pessoas"
-							element={<Pessoas />}
-						/>
-					</Routes>
-				</div>
-			</ThemeProvider>
-		</>
-	);
+  const theme = createTheme({
+    palette: {
+      primary: { main: '#CF2E2E' },
+    },
+  });
+  return (
+    <>
+      <ThemeProvider theme={theme}>
+        <div className="App">
+          <Routes>
+            <Route path="/home" element={<LandingPage />} />
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/meu-cadastro" element={<MeuCadastro />} />
+            <Route path="/usuarios" element={<Usuarios />} />
+            <Route path="/pessoas" element={<Pessoas />} />
+            <Route path="/contatos" element={<Contatos />} />
+          </Routes>
+        </div>
+      </ThemeProvider>
+    </>
+  );
 }
 
 export default App;

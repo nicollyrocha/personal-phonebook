@@ -14,119 +14,100 @@ import EditIcon from '@mui/icons-material/Edit';
 import Avatar from '@mui/material/Avatar';
 
 export default function TableFavoritos({
-	rows,
-	setUserSelected,
-	setOpenModalDeleteFavorite,
+  rows,
+  setUserSelected,
+  setOpenModalDeleteFavorite,
 }) {
-	const [page, setPage] = React.useState(0);
-	const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-	const handleChangePage = (event, newPage) => {
-		setPage(newPage);
-	};
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-	function onClickOpenModalDelete(row) {
-		console.log('alo', row);
-		setOpenModalDeleteFavorite(true);
-	}
+  function onClickOpenModalDelete(row) {
+    setOpenModalDeleteFavorite(true);
+  }
 
-	const handleChangeRowsPerPage = (event) => {
-		setRowsPerPage(+event.target.value);
-		setPage(0);
-	};
-	console.log('rows', rows);
-	return (
-		<Paper sx={{ width: '100%', overflow: 'hidden' }}>
-			<TableContainer sx={{ maxHeight: 440 }}>
-				<Table
-					stickyHeader
-					aria-label="sticky table"
-					sx={{
-						boxShadow: 2,
-						border: 2,
-						borderColor: 'primary.light',
-						'& .MuiDataGrid-cell': {
-							justifyContent: 'center',
-						},
-						'& .MuiDataGrid-columnHeaderTitleContainer': {
-							justifyContent: 'center',
-						},
-					}}
-				>
-					<TableHead>
-						<TableRow>
-							<TableCell
-								align="center"
-								style={{ fontWeight: 700 }}
-							>
-								Nome
-							</TableCell>
-							<TableCell
-								align="center"
-								style={{ fontWeight: 700 }}
-							>
-								Tipo
-							</TableCell>
-							<TableCell
-								align="center"
-								style={{ fontWeight: 700 }}
-							>
-								E-mail
-							</TableCell>
-							<TableCell
-								align="center"
-								style={{ fontWeight: 700 }}
-							>
-								Telefone
-							</TableCell>
-							<TableCell
-								align="center"
-								style={{ fontWeight: 700 }}
-							>
-								Tag
-							</TableCell>
-							<TableCell
-								align="right"
-								style={{ fontWeight: 700 }}
-							></TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{rows.map((row) => (
-							<TableRow key={row.id}>
-								<TableCell align="center">{row.pessoa.nome}</TableCell>
-								<TableCell align="center">{row.tipoContato}</TableCell>
-								<TableCell align="center">{row.email}</TableCell>
-								<TableCell align="center">{row.telefone}</TableCell>
-								<TableCell align="center">{row.tag}</TableCell>
-								<TableCell align="center">
-									{
-										<>
-											<IconButton
-												aria-label="delete"
-												onClick={() => (
-													setUserSelected(row), setOpenModalDeleteFavorite(true)
-												)}
-											>
-												<DeleteIcon />
-											</IconButton>
-										</>
-									}
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
-			<TablePagination
-				rowsPerPageOptions={[10, 25, 100]}
-				component="div"
-				count={rows.length}
-				rowsPerPage={rowsPerPage}
-				page={page}
-				onPageChange={handleChangePage}
-				onRowsPerPageChange={handleChangeRowsPerPage}
-			/>
-		</Paper>
-	);
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  return (
+    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <TableContainer sx={{ maxHeight: 440 }}>
+        <Table
+          stickyHeader
+          aria-label="sticky table"
+          sx={{
+            boxShadow: 2,
+            border: 2,
+            borderColor: 'primary.light',
+            '& .MuiDataGrid-cell': {
+              justifyContent: 'center',
+            },
+            '& .MuiDataGrid-columnHeaderTitleContainer': {
+              justifyContent: 'center',
+            },
+          }}
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell align="center" style={{ fontWeight: 700 }}>
+                Nome
+              </TableCell>
+              <TableCell align="center" style={{ fontWeight: 700 }}>
+                Tipo
+              </TableCell>
+              <TableCell align="center" style={{ fontWeight: 700 }}>
+                E-mail
+              </TableCell>
+              <TableCell align="center" style={{ fontWeight: 700 }}>
+                Telefone
+              </TableCell>
+              <TableCell align="center" style={{ fontWeight: 700 }}>
+                Tag
+              </TableCell>
+              <TableCell align="right" style={{ fontWeight: 700 }}></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell align="center">{row.pessoa.nome}</TableCell>
+                <TableCell align="center">{row.tipoContato}</TableCell>
+                <TableCell align="center">{row.email}</TableCell>
+                <TableCell align="center">{row.telefone}</TableCell>
+                <TableCell align="center">{row.tag}</TableCell>
+                <TableCell align="center">
+                  {
+                    <>
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => (
+                          setUserSelected(row), setOpenModalDeleteFavorite(true)
+                        )}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
+                  }
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
+        component="div"
+        count={rows.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </Paper>
+  );
 }

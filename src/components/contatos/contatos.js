@@ -17,12 +17,12 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import TablePessoas from './table-pessoas';
 import ModalDelete from './modals/modal-delete';
 import ModalAdd from './modals/modal-add';
+import TableContatos from './tables/table-contatos';
 import ModalEdit from './modals/modal-edit';
 
-function Pessoas() {
+function Contatos() {
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -43,7 +43,7 @@ function Pessoas() {
     );
   }
 
-  const [rowsPeople, setRowsPeople] = React.useState([]);
+  const [rowsContacts, setRowsContacts] = React.useState([]);
   const contactsData = [];
   const location = useLocation();
   const dados = location.state.data;
@@ -75,18 +75,36 @@ function Pessoas() {
   };
 
   useEffect(() => {
-    searchPeople();
+    searchContacts();
+    searchFavorites();
   }, []);
 
-  async function searchPeople() {
+  async function searchContacts() {
     try {
-      const contacts = await api.post(`/api/pessoa/pesquisar`, {
-        nome: '',
-      });
-
+      const contacts = await api.get(
+        `/api/contato/listar/${location.state.data.id}`,
+        {
+          headers: { Authorization: `Bearer ${location.state.data.token}` },
+        }
+      );
       contacts.data.forEach((contact) => (contact.key = uuidv4()));
-      setRowsPeople(contacts.data);
+      setRowsContacts(contacts.data);
       contacts.data.forEach((contact) => contactsData.push(contact));
+    } catch (e) {}
+  }
+
+  async function searchFavorites() {
+    try {
+      const favorites = await api.get(`/api/favorito/pesquisar`, {
+        headers: { Authorization: `Bearer ${location.state.data.token}` },
+      });
+      favorites.data.forEach((contact) => (contact.key = uuidv4()));
+
+      var retorno = favorites.data.filter(
+        (favorite) => favorite.usuario.id === location.state.data.id
+      );
+      setFavoritesData(retorno);
+      favorites.data.forEach((contact) => contactsData.push(contact.pessoa));
     } catch (e) {}
   }
 
@@ -108,20 +126,41 @@ function Pessoas() {
             setOpenModalEdit={setOpenModalEdit}
             userSelected={userSelected}
             setUserSelected={setUserSelected}
-          />{' '}
+          />
         </>
       ) : (
         ''
       )}
+
       <NavBar dados={dados} />
-      <Box sx={{ width: '100%', marginTop: '15vh' }}>
-        <TablePessoas
-          rows={rowsPeople}
-          setUserSelected={setUserSelected}
-          setOpenModalDelete={setOpenModalDelete}
-          setOpenModalEdit={setOpenModalEdit}
-          setOpenModalFavorite={setOpenModalFavorite}
-        />
+      <Box sx={{ width: '100%', marginTop: '5vh' }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="basic tabs example"
+          >
+            <Tab label="Contatos" {...a11yProps(0)} />
+            <Tab label="Favoritos" {...a11yProps(1)} />
+          </Tabs>
+        </Box>
+        <TabPanel value={value} index={0}>
+          <div
+            style={{
+              height: 400,
+              width: '100%',
+              marginTop: '5vh',
+            }}
+          >
+            <TableContatos
+              rows={rowsContacts}
+              setUserSelected={setUserSelected}
+              setOpenModalDelete={setOpenModalDelete}
+              setOpenModalEdit={setOpenModalEdit}
+              setOpenModalFavorite={setOpenModalFavorite}
+            />
+          </div>
+        </TabPanel>
       </Box>
       <IconButton aria-label="add">
         <AddCircleIcon
@@ -134,4 +173,4 @@ function Pessoas() {
   );
 }
 
-export default Pessoas;
+export default Contatos;

@@ -1,64 +1,69 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import Snackbar from '@mui/material/Snackbar';
+import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import api from '../../../services/api';
-import CircularProgress from '@mui/material/CircularProgress';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import MuiAlert from '@mui/material/Alert';
 
-export default function ModalDeleteFav({
-  openModalDeleteFavorite,
-  setOpenModalDeleteFavorite,
+export default function ModalDelete({
+  openModalDelete,
+  setOpenModalDelete,
   userSelected,
 }) {
-  const [loading, setLoading] = React.useState(false);
-  const [showMsg, setShowMsg] = React.useState(false);
-  const [msg, setMsg] = React.useState('');
-  const [severity, setSeverity] = React.useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showMsg, setShowMsg] = useState(false);
+  const [msg, setMsg] = useState('');
+  const [severity, setSeverity] = useState('');
+  const [openErrorMsg, setOpenErrorMsg] = useState(false);
   const location = useLocation();
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
+
   async function deleteContact(id) {
-    setLoading(true);
+    setIsLoading(true);
     try {
-      setLoading(true);
-      await api.delete(`/api/favorito/remover/${id}`);
+      await api.delete(`/api/contato/remover/${id}`);
       setTimeout(() => {
-        setLoading(false);
+        setIsLoading(false);
+        setMsg('Pessoa alterada com sucesso!');
         setShowMsg(true);
-        setMsg('Contato removido dos favoritos com sucesso!');
         setSeverity('success');
-        setOpenModalDeleteFavorite(false);
-        window.location.reload(1);
+        setOpenModalDelete(false);
       }, '2000');
     } catch (e) {
-      setShowMsg(true);
-      setMsg(e.response.data.error);
-      setSeverity('error');
+      setTimeout(() => {
+        setIsLoading(false);
+        setMsg(e.response.data.error);
+        setShowMsg(true);
+        setSeverity('error');
+      }, '2000');
     }
   }
 
   const handleClose = () => {
-    setOpenModalDeleteFavorite(false);
+    setOpenModalDelete(false);
   };
 
   return (
     <div style={{ display: 'flex', textAlign: 'center' }}>
       {showMsg === true ? (
-        <>
-          <Snackbar
-            open={showMsg}
-            autoHideDuration={6000}
-            onClose={() => setShowMsg(false)}
-          >
-            <Alert severity={severity}>{msg !== '' ? msg : ''}</Alert>
-          </Snackbar>
-        </>
+        <Snackbar
+          open={openErrorMsg}
+          autoHideDuration={6000}
+          onClose={() => setOpenErrorMsg(false)}
+        >
+          <Alert severity={severity}>{msg}</Alert>
+        </Snackbar>
       ) : null}
       <Dialog
-        open={openModalDeleteFavorite}
+        open={openModalDelete}
         onClose={handleClose}
         style={{ textAlign: 'center', alignSelf: 'center' }}
         fullWidth
@@ -68,10 +73,8 @@ export default function ModalDeleteFav({
         }?`}</DialogTitle>
 
         <DialogActions>
-          <Button onClick={() => setOpenModalDeleteFavorite(false)}>
-            Cancelar
-          </Button>
-          {loading === true ? (
+          <Button onClick={() => setOpenModalDelete(false)}>Cancelar</Button>
+          {isLoading === true ? (
             <CircularProgress
               size={22}
               style={{

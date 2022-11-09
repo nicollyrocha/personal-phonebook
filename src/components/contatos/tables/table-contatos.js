@@ -21,7 +21,7 @@ export default function TableContatos({
   setOpenModalFavorite,
 }) {
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -46,9 +46,10 @@ export default function TableContatos({
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 430, marginTop: 0, top: 0 }}>
+      <TableContainer sx={{ maxHeight: 440 }}>
         <Table
           stickyHeader
+          aria-label="sticky table"
           sx={{
             boxShadow: 2,
             border: 2,
@@ -64,17 +65,19 @@ export default function TableContatos({
           <TableHead>
             <TableRow>
               <TableCell align="center" style={{ fontWeight: 700 }}>
-                ID
-              </TableCell>
-              <TableCell align="center" style={{ fontWeight: 700 }}>
                 Nome
               </TableCell>
               <TableCell align="center" style={{ fontWeight: 700 }}>
-                CPF
+                Tipo
               </TableCell>
-
               <TableCell align="center" style={{ fontWeight: 700 }}>
-                Endereço
+                E-mail
+              </TableCell>
+              <TableCell align="center" style={{ fontWeight: 700 }}>
+                Telefone
+              </TableCell>
+              <TableCell align="center" style={{ fontWeight: 700 }}>
+                Tag
               </TableCell>
               <TableCell align="right" style={{ fontWeight: 700 }}></TableCell>
             </TableRow>
@@ -82,15 +85,11 @@ export default function TableContatos({
           <TableBody>
             {rows.map((row) => (
               <TableRow key={row.id}>
-                <TableCell align="center">{row.id}</TableCell>
-                <TableCell align="center">{row.nome}</TableCell>
-                <TableCell align="center">{row.cpf}</TableCell>
-
-                <TableCell align="center">{`${row.endereco.logradouro},${
-                  ' ' + row.endereco.numero
-                }\n${row.endereco.bairro},${' ' + row.endereco.cidade} - ${
-                  row.endereco.estado
-                }\n${row.endereco.pais}`}</TableCell>
+                <TableCell align="center">{row.pessoa.nome}</TableCell>
+                <TableCell align="center">{row.tipoContato}</TableCell>
+                <TableCell align="center">{row.email}</TableCell>
+                <TableCell align="center">{row.telefone}</TableCell>
+                <TableCell align="center">{row.tag}</TableCell>
                 <TableCell align="center">
                   {
                     <>
@@ -119,7 +118,7 @@ export default function TableContatos({
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 15]}
+        rowsPerPageOptions={[10, 25, 100]}
         component="div"
         count={rows.length}
         rowsPerPage={rowsPerPage}
