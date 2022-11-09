@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
+body {
+	height: 100vh;
+	width: 100vw;
+	font-family: 'Rubik', sans-serif;
+	background-color: #f1f2f2;
+}
+.login {
+	justify-content: center;
+	align-items: center;
+	height: 85vh;
+	width: 100vw;
+	display: flex;
+}
+.item-login {
+	flex-direction: column;
+}
+.box-login {
+	min-width: 40vw;
+	min-height: 60vh;
+	max-width: 70vw;
+	max-height: 50vh;
+	flex-direction: column;
+	place-content: center;
+	background-color: white;
+	border-radius: 5px;
+	align-items: center;
+	display: flex;
+	text-align: center;
+	border-color: #cf2e2e;
+	border-width: 1px;
+	border-style: solid;
+	box-shadow: 0 0 3px #ff0000, 0 0 5px #cf2e2e;
+	justify-content: center;
+	margin-left: 5vw;
+	margin-right: 5vw;
+}
+.div-login {
+	margin: 3vh;
+	display: flex;
+	justify-content: space-evenly;
+}
+.buttons {
+	display: flex;
+	flex-direction: column;
+	margin-top: 2vh;
+	justify-content: space-evenly;
+}
+
+@media screen and (min-width: 500px) and (max-width: 1000px) {
+	.box-login {
+		display: flex;
+		width: 50vw;
+	}
+	.buttons {
+		flex-flow: column;
+	}
+	.login {
+		height: 100vh;
+		width: 100vw;
+		display: flex;
+		background-size: cover;
+		background-repeat: unset;
+		font-family: 'Rubik', sans-serif;
+		background-color: #f1f2f2;
+		background-image: none;
+	}
+}
+
+@media screen and (min-height: 500px) and (max-height: 700px) {
+	.box-login {
+		display: flex;
+		height: 50vh;
+	}
+	.buttons {
+		flex-flow: column;
+	}
+	.login {
+		background-repeat: no-repeat;
+		height: 100vh;
+		width: 100vw;
+		display: flex;
+		background-size: cover;
+		background-position: right;
+		font-family: 'Rubik', sans-serif;
+		background-color: #f1f2f2;
+	}
+}
+.div-geral {
+	padding: 2%;
+}
+.main-title {
+	font-size: 36px;
+	font-weight: 700;
+	color: white;
+	text-shadow: 1px 1px 2px #cf2e2e, 0 0 10px #cf2e2e, 0 0 5px #cf2e2e;
+	display: flex;
+	justify-content: center;
+	background-color: #eccccc;
+	height: 70px;
+	align-items: center;
+	box-shadow: 0 0 3px #ff0000, 0 0 5px #cf2e2e;
+	border-bottom: 1px;
+	border-bottom-color: #cf2e2e;
+	border-bottom-style: solid;
+}
