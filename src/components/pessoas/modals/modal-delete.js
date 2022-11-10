@@ -11,81 +11,81 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
 export default function ModalDelete({
-  openModalDelete,
-  setOpenModalDelete,
-  userSelected,
+	openModalDelete,
+	setOpenModalDelete,
+	userSelected,
 }) {
-  const location = useLocation();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [showMsg, setShowMsg] = React.useState(false);
-  const [msg, setMsg] = React.useState('');
-  const [severity, setSeverity] = React.useState('');
+	const location = useLocation();
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [showMsg, setShowMsg] = React.useState(false);
+	const [msg, setMsg] = React.useState('');
+	const [severity, setSeverity] = React.useState('');
 
-  async function deleteContact(id) {
-    try {
-      setIsLoading(true);
-      await api.delete(`/api/pessoa/remover/${id}`);
-      setTimeout(() => {
-        setIsLoading(false);
-        setShowMsg(true);
-        setMsg('Pessoa deletada com sucesso!');
-        setSeverity('success');
-        setOpenModalDelete(false);
-        window.location.reload(1);
-      }, '2000');
-    } catch (e) {
-      setIsLoading(false);
+	async function deleteContact(id) {
+		try {
+			setIsLoading(true);
+			await api.delete(`/api/pessoa/remover/${id}`);
+			setTimeout(() => {
+				setIsLoading(false);
+				setShowMsg(true);
+				setMsg('Pessoa deletada com sucesso!');
+				setSeverity('success');
+				setOpenModalDelete(false);
+				window.location.reload(1);
+			}, '2000');
+		} catch (e) {
+			setIsLoading(false);
 
-      setShowMsg(true);
-      setMsg(e);
-      setSeverity('error');
-    }
-  }
+			setShowMsg(true);
+			setMsg(e.response.data.message);
+			setSeverity('error');
+		}
+	}
 
-  const handleClose = () => {
-    setOpenModalDelete(false);
-  };
+	const handleClose = () => {
+		setOpenModalDelete(false);
+	};
 
-  return (
-    <div style={{ display: 'flex', textAlign: 'center' }}>
-      {showMsg === true ? (
-        <>
-          <Snackbar
-            open={showMsg}
-            autoHideDuration={6000}
-            onClose={() => setShowMsg(false)}
-          >
-            <Alert severity={severity}>{msg !== '' ? msg : ''}</Alert>
-          </Snackbar>
-        </>
-      ) : null}
-      <Dialog
-        open={openModalDelete}
-        onClose={handleClose}
-        style={{ textAlign: 'center', alignSelf: 'center' }}
-        fullWidth
-      >
-        <DialogTitle>{`Tem certeza que deseja excluir o contato ${
-          userSelected ? userSelected.nome : ''
-        }?`}</DialogTitle>
+	return (
+		<div style={{ display: 'flex', textAlign: 'center' }}>
+			{showMsg === true ? (
+				<>
+					<Snackbar
+						open={showMsg}
+						autoHideDuration={6000}
+						onClose={() => setShowMsg(false)}
+					>
+						<Alert severity={severity}>{msg !== '' ? msg : ''}</Alert>
+					</Snackbar>
+				</>
+			) : null}
+			<Dialog
+				open={openModalDelete}
+				onClose={handleClose}
+				style={{ textAlign: 'center', alignSelf: 'center' }}
+				fullWidth
+			>
+				<DialogTitle>{`Tem certeza que deseja excluir o contato ${
+					userSelected ? userSelected.nome : ''
+				}?`}</DialogTitle>
 
-        <DialogActions>
-          <Button onClick={() => setOpenModalDelete(false)}>Cancelar</Button>
-          {isLoading === true ? (
-            <CircularProgress
-              size={22}
-              style={{
-                marginTop: '1vh',
-                marginRight: '1vw',
-                marginLeft: '1vw',
-                marginBottom: '1vh',
-              }}
-            />
-          ) : (
-            <Button onClick={() => deleteContact(userSelected.id)}>Sim</Button>
-          )}
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
+				<DialogActions>
+					<Button onClick={() => setOpenModalDelete(false)}>Cancelar</Button>
+					{isLoading === true ? (
+						<CircularProgress
+							size={22}
+							style={{
+								marginTop: '1vh',
+								marginRight: '1vw',
+								marginLeft: '1vw',
+								marginBottom: '1vh',
+							}}
+						/>
+					) : (
+						<Button onClick={() => deleteContact(userSelected.id)}>Sim</Button>
+					)}
+				</DialogActions>
+			</Dialog>
+		</div>
+	);
 }

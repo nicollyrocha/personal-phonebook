@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
 body {
-	height: 100vh;
-	width: 100vw;
+	height: 100%;
+	width: 100%;
 	font-family: 'Rubik', sans-serif;
 }
 .form-control-cadastro {
@@ -21,6 +21,7 @@ body {
 	border-width: 1px;
 	border-style: solid;
 	box-shadow: 0 0 3px #ff0000, 0 0 5px #cf2e2e;
+	padding: 0;
 }
 .title-edit {
 	margin: 10px;

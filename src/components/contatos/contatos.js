@@ -22,155 +22,138 @@ import ModalAdd from './modals/modal-add';
 import TableContatos from './tables/table-contatos';
 import ModalEdit from './modals/modal-edit';
 
-function Contatos() {
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
+function Contatos({ setLogado }) {
+	function TabPanel(props) {
+		const { children, value, index, ...other } = props;
 
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
-      </div>
-    );
-  }
+		return (
+			<div
+				role="tabpanel"
+				hidden={value !== index}
+				id={`simple-tabpanel-${index}`}
+				aria-labelledby={`simple-tab-${index}`}
+				{...other}
+			>
+				{value === index && (
+					<Box sx={{ p: 3 }}>
+						<Typography>{children}</Typography>
+					</Box>
+				)}
+			</div>
+		);
+	}
 
-  const [rowsContacts, setRowsContacts] = React.useState([]);
-  const contactsData = [];
-  const location = useLocation();
-  const dados = location.state.data;
-  const [value, setValue] = React.useState(0);
-  const [favoritesData, setFavoritesData] = React.useState([]);
-  const [openModalDelete, setOpenModalDelete] = React.useState(false);
-  const [openModalAdd, setOpenModalAdd] = React.useState(false);
-  const [openModalEdit, setOpenModalEdit] = React.useState(false);
-  const [openModalFavorite, setOpenModalFavorite] = React.useState(false);
-  const [openModalDeleteFavorite, setOpenModalDeleteFavorite] =
-    React.useState(false);
-  const [userSelected, setUserSelected] = React.useState('');
+	const [rowsContacts, setRowsContacts] = React.useState([]);
+	const contactsData = [];
+	const location = useLocation();
+	const dados = location.state.data;
+	const [value, setValue] = React.useState(0);
+	const [favoritesData, setFavoritesData] = React.useState([]);
+	const [openModalDelete, setOpenModalDelete] = React.useState(false);
+	const [openModalAdd, setOpenModalAdd] = React.useState(false);
+	const [openModalEdit, setOpenModalEdit] = React.useState(false);
+	const [openModalFavorite, setOpenModalFavorite] = React.useState(false);
+	const [openModalDeleteFavorite, setOpenModalDeleteFavorite] =
+		React.useState(false);
+	const [userSelected, setUserSelected] = React.useState('');
 
-  TabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-  };
+	TabPanel.propTypes = {
+		children: PropTypes.node,
+		index: PropTypes.number.isRequired,
+		value: PropTypes.number.isRequired,
+	};
 
-  function a11yProps(index) {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    };
-  }
+	function a11yProps(index) {
+		return {
+			id: `simple-tab-${index}`,
+			'aria-controls': `simple-tabpanel-${index}`,
+		};
+	}
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+	const handleChange = (event, newValue) => {
+		setValue(newValue);
+	};
 
-  useEffect(() => {
-    searchContacts();
-    searchFavorites();
-  }, []);
+	useEffect(() => {
+		searchContacts();
+		searchFavorites();
+	}, []);
 
-  async function searchContacts() {
-    try {
-      const contacts = await api.get(
-        `/api/contato/listar/${location.state.data.id}`,
-        {
-          headers: { Authorization: `Bearer ${location.state.data.token}` },
-        }
-      );
-      contacts.data.forEach((contact) => (contact.key = uuidv4()));
-      setRowsContacts(contacts.data);
-      contacts.data.forEach((contact) => contactsData.push(contact));
-    } catch (e) {}
-  }
+	async function searchContacts() {
+		try {
+			const contacts = await api.get(
+				`/api/contato/listar/${location.state.data.id}`,
+				{
+					headers: { Authorization: `Bearer ${location.state.data.token}` },
+				}
+			);
+			contacts.data.forEach((contact) => (contact.key = uuidv4()));
+			setRowsContacts(contacts.data);
+			contacts.data.forEach((contact) => contactsData.push(contact));
+		} catch (e) {}
+	}
 
-  async function searchFavorites() {
-    try {
-      const favorites = await api.get(`/api/favorito/pesquisar`, {
-        headers: { Authorization: `Bearer ${location.state.data.token}` },
-      });
-      favorites.data.forEach((contact) => (contact.key = uuidv4()));
+	async function searchFavorites() {
+		try {
+			const favorites = await api.get(`/api/favorito/pesquisar`, {
+				headers: { Authorization: `Bearer ${location.state.data.token}` },
+			});
+			favorites.data.forEach((contact) => (contact.key = uuidv4()));
 
-      var retorno = favorites.data.filter(
-        (favorite) => favorite.usuario.id === location.state.data.id
-      );
-      setFavoritesData(retorno);
-      favorites.data.forEach((contact) => contactsData.push(contact.pessoa));
-    } catch (e) {}
-  }
+			var retorno = favorites.data.filter(
+				(favorite) => favorite.usuario.id === location.state.data.id
+			);
+			setFavoritesData(retorno);
+			favorites.data.forEach((contact) => contactsData.push(contact.pessoa));
+		} catch (e) {}
+	}
 
-  return (
-    <>
-      {userSelected ? (
-        <>
-          <ModalDelete
-            openModalDelete={openModalDelete}
-            setOpenModalDelete={setOpenModalDelete}
-            userSelected={userSelected}
-          />
-          <ModalAdd
-            openModalAdd={openModalAdd}
-            setOpenModalAdd={setOpenModalAdd}
-          />
-          <ModalEdit
-            openModalEdit={openModalEdit}
-            setOpenModalEdit={setOpenModalEdit}
-            userSelected={userSelected}
-            setUserSelected={setUserSelected}
-          />
-        </>
-      ) : (
-        ''
-      )}
+	return (
+		<>
+			<ModalAdd
+				openModalAdd={openModalAdd}
+				setOpenModalAdd={setOpenModalAdd}
+			/>
+			{userSelected ? (
+				<>
+					<ModalDelete
+						openModalDelete={openModalDelete}
+						setOpenModalDelete={setOpenModalDelete}
+						userSelected={userSelected}
+					/>
 
-      <NavBar dados={dados} />
-      <Box sx={{ width: '100%', marginTop: '5vh' }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-          >
-            <Tab label="Contatos" {...a11yProps(0)} />
-            <Tab label="Favoritos" {...a11yProps(1)} />
-          </Tabs>
-        </Box>
-        <TabPanel value={value} index={0}>
-          <div
-            style={{
-              height: 400,
-              width: '100%',
-              marginTop: '5vh',
-            }}
-          >
-            <TableContatos
-              rows={rowsContacts}
-              setUserSelected={setUserSelected}
-              setOpenModalDelete={setOpenModalDelete}
-              setOpenModalEdit={setOpenModalEdit}
-              setOpenModalFavorite={setOpenModalFavorite}
-            />
-          </div>
-        </TabPanel>
-      </Box>
-      <IconButton aria-label="add">
-        <AddCircleIcon
-          fontSize="large"
-          color="primary"
-          onClick={() => setOpenModalAdd(true)}
-        />
-      </IconButton>
-    </>
-  );
+					<ModalEdit
+						openModalEdit={openModalEdit}
+						setOpenModalEdit={setOpenModalEdit}
+						userSelected={userSelected}
+						setUserSelected={setUserSelected}
+					/>
+				</>
+			) : (
+				''
+			)}
+
+			<NavBar setLogado={setLogado} />
+			<Box sx={{ maxWidth: '100vw', marginTop: '15vh', minWidth: '10vw' }}>
+				<TableContatos
+					rows={rowsContacts}
+					setUserSelected={setUserSelected}
+					setOpenModalDelete={setOpenModalDelete}
+					setOpenModalEdit={setOpenModalEdit}
+					setOpenModalFavorite={setOpenModalFavorite}
+				/>
+			</Box>
+			<IconButton
+				aria-label="add"
+				onClick={() => setOpenModalAdd(true)}
+			>
+				<AddCircleIcon
+					fontSize="large"
+					color="primary"
+				/>
+			</IconButton>
+		</>
+	);
 }
 
 export default Contatos;

@@ -5,277 +5,325 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import api from '../../../services/api';
-import CircularProgress from '@mui/material/CircularProgress';
+import { useLocation } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { v4 as uuidv4 } from 'uuid';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function ModalAdd({ openModalAdd, setOpenModalAdd }) {
-  const [cep, setCep] = React.useState('');
-  const [pais, setPais] = React.useState('');
-  const [estado, setEstado] = React.useState('');
-  const [cidade, setCidade] = React.useState('');
-  const [bairro, setBairro] = React.useState('');
-  const [logradouro, setLogradouro] = React.useState('');
-  const [numero, setNumero] = React.useState();
-  const [cpf, setCpf] = React.useState();
-  const [nome, setNome] = React.useState();
-  const [id, setId] = React.useState();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [showMsg, setShowMsg] = React.useState(false);
-  const [msg, setMsg] = React.useState('');
-  const [severity, setSeverity] = React.useState('');
-  const [image, setImage] = React.useState();
+	const [cep, setCep] = React.useState('');
+	const [pais, setPais] = React.useState('');
+	const [estado, setEstado] = React.useState('');
+	const [cidade, setCidade] = React.useState('');
+	const [bairro, setBairro] = React.useState('');
+	const [logradouro, setLogradouro] = React.useState('');
+	const [numero, setNumero] = React.useState();
 
-  const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
+	const [cpf, setCpf] = React.useState();
+	const [email, setEmail] = React.useState();
+	const [nome, setNome] = React.useState();
+	const [id, setId] = React.useState();
+	const [userData, setUserData] = React.useState();
+	const [image, setImage] = React.useState();
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [showMsg, setShowMsg] = React.useState(false);
+	const [msg, setMsg] = React.useState('');
+	const [severity, setSeverity] = React.useState('');
+	let idImage;
+	const location = useLocation();
 
-  const handleClose = () => {
-    setOpenModalAdd(false);
-  };
+	const Alert = React.forwardRef(function Alert(props, ref) {
+		return (
+			<MuiAlert
+				elevation={6}
+				ref={ref}
+				variant="filled"
+				{...props}
+			/>
+		);
+	});
 
-  function onChangeCep(e) {
-    var v = e.target.value.replace(/\D/g, '');
+	React.useEffect(() => {
+		searchUserData();
+	}, []);
 
-    v = v.replace(/^(\d{5})(\d)/, '$1-$2');
+	const handleClose = () => {
+		setOpenModalAdd(false);
+	};
 
-    e.target.value = v;
-    setCep(v);
-  }
+	async function searchUserData() {
+		try {
+			const userData = await api.get(
+				`/api/usuario/buscar/${location.state.data.id}`
+			);
+			setUserData({
+				...userData,
+				cpf: userData.data.object.usuario.cpf,
+				email: userData.data.object.usuario.email,
+				name: userData.data.object.usuario.nome,
+				password: userData.data.object.usuario.password,
+				number: userData.data.object.usuario.telefone,
+				user: userData.data.object.usuario.username,
+				id: userData.data.object.usuario.id,
+				dataNascimento: userData.data.object.usuario.dataNascimento,
+			});
+		} catch (e) {
+			setShowMsg(true);
+			setMsg(e);
+		}
+	}
 
-  async function onBlurCep() {
-    fetch(`https://viacep.com.br/ws/${cep}/json/`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPais(data.pais);
-        setEstado(data.uf);
-        setCidade(data.localidade);
-        setBairro(data.bairro);
-        setLogradouro(data.logradouro);
-      });
-  }
+	function onChangeCep(e) {
+		var v = e.target.value.replace(/\D/g, '');
 
-  async function addContact() {
-    try {
-      setIsLoading(true);
+		v = v.replace(/^(\d{5})(\d)/, '$1-$2');
 
-      await api.post(`api/foto/upload/${id}`, image, {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      });
+		e.target.value = v;
+		setCep(v);
+	}
 
-      await api.post('api/pessoa/salvar', {
-        cpf: cpf,
-        endereco: {
-          bairro: bairro,
-          cep: cep,
-          cidade: cidade,
-          estado: estado,
-          id: id,
-          logradouro: logradouro,
-          numero: numero,
-          pais: pais,
-        },
-        foto: {
-          id: image.id,
-          name: image.name,
-          type: image.type,
-        },
-        id: id,
-        nome: nome,
-      });
+	const onFileChange = (e) => {
+		setImage(e.target.files[0]);
+	};
 
-      setTimeout(() => {
-        setIsLoading(false);
-        setMsg('Pessoa alterada com sucesso!');
-        setShowMsg(true);
-        setSeverity('success');
-        setOpenModalAdd(false);
-      }, '2000');
-      window.location.reload(1);
-    } catch (e) {
-      setTimeout(() => {
-        setIsLoading(false);
-        setMsg(e.response.data.error);
-        setShowMsg(true);
-        setSeverity('error');
-      }, '2000');
-    }
-  }
+	async function onBlurCep() {
+		fetch(`https://viacep.com.br/ws/${cep}/json/`)
+			.then((res) => res.json())
+			.then((data) => {
+				setPais(data.pais);
+				setEstado(data.uf);
+				setCidade(data.localidade);
+				setBairro(data.bairro);
+				setLogradouro(data.logradouro);
+			});
+	}
 
-  return (
-    <div style={{ display: 'flex', textAlign: 'center', columnCount: '3' }}>
-      <Dialog
-        open={openModalAdd}
-        onClose={handleClose}
-        style={{
-          display: 'flex',
-          textAlign: 'center',
-          alignSelf: 'center',
-          flexDirection: 'column',
-          columnCount: '3',
-        }}
-        fullWidth
-      >
-        {showMsg === true ? (
-          <>
-            <Snackbar
-              open={showMsg}
-              autoHideDuration={6000}
-              onClose={() => setShowMsg(false)}
-            >
-              <Alert severity={severity}>{msg}</Alert>
-            </Snackbar>
-          </>
-        ) : null}
-        <DialogTitle>Adicionar nova pessoa.</DialogTitle>
-        <div
-          style={{
-            textAlign: 'center',
-            alignSelf: 'center',
-            flexDirection: 'column',
-            columnCount: 3,
-          }}
-        >
-          <TextField
-            id="outlined-basic"
-            label="ID"
-            variant="outlined"
-            onChange={(e) => setId(e.target.value.replace(/^\D/g, ''))}
-            value={id}
-            style={{ padding: 5 }}
-          />
-          <TextField
-            id="outlined-basic"
-            label="Nome"
-            variant="outlined"
-            style={{ padding: 5 }}
-            onChange={(e) => setNome(e.target.value)}
-          />
-          <TextField
-            id="outlined-basic"
-            label="CPF"
-            variant="outlined"
-            value={cpf}
-            onChange={(e) =>
-              setCpf(
-                e.target.value
-                  .replace(/\D/g, '')
-                  .replace(/(\d{3})(\d)/, '$1.$2')
-                  .replace(/(\d{3})(\d)/, '$1.$2')
-                  .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-                  .replace(/(-\d{2})\d+?$/, '$1')
-              )
-            }
-            style={{ padding: 5 }}
-          />
-          <TextField
-            id="outlined-basic"
-            label="CEP"
-            variant="outlined"
-            style={{ padding: 5 }}
-            onChange={(e) => onChangeCep(e)}
-            inputProps={{ maxLength: '9' }}
-            onBlur={() => onBlurCep()}
-          />
-          <TextField
-            id="outlined-basic"
-            label="País"
-            variant="outlined"
-            style={{ padding: 5 }}
-            onChange={(e) => setPais(e.target.value)}
-            value={pais}
-          />
-          <TextField
-            id="outlined-basic"
-            label="Estado"
-            variant="outlined"
-            style={{ padding: 5 }}
-            onChange={(e) => setEstado(e.target.value)}
-            value={estado}
-          />
-          <TextField
-            id="outlined-basic"
-            label="Cidade"
-            variant="outlined"
-            style={{ padding: 5 }}
-            onChange={(e) => setCidade(e.target.value)}
-            value={cidade}
-          />
-          <TextField
-            id="outlined-basic"
-            label="Bairro"
-            variant="outlined"
-            style={{ padding: 5 }}
-            onChange={(e) => setBairro(e.target.value)}
-            value={bairro}
-          />
-          <TextField
-            id="outlined-basic"
-            label="Logradouro"
-            variant="outlined"
-            style={{ padding: 5 }}
-            onChange={(e) => setLogradouro(e.target.value)}
-            value={logradouro}
-          />
-          <TextField
-            id="outlined-basic"
-            label="Número"
-            variant="outlined"
-            style={{ padding: 5 }}
-            onChange={(e) => {
-              var v = e.target.value.replace(/\D/g, '');
+	async function addContact() {
+		const formData = new FormData();
+		formData.append('foto', image);
 
-              v = v.replace(/^\D/, '');
+		try {
+			setIsLoading(true);
 
-              e.target.value = v;
-              setNumero(v);
-            }}
-          />
-          <br />
-        </div>
-        <Button
-          variant="contained"
-          component="label"
-          style={{
-            backgroundColor: '#cf2e2e',
-            width: '10vw',
-            alignSelf: 'center',
-          }}
-        >
-          Upload File
-          <input
-            type="file"
-            hidden
-            accept="image/*"
-            onClick={(e) =>
-              setImage({
-                id: uuidv4(),
-                name: e.target.files[0].name,
-                type: e.target.files[0].type,
-              })
-            }
-          />
-        </Button>
-        <DialogActions>
-          <Button onClick={() => handleClose()}>Cancelar</Button>
-          {isLoading === true ? (
-            <CircularProgress
-              size={22}
-              style={{
-                marginTop: '1vh',
-                marginRight: '1vw',
-                marginLeft: '1vw',
-                marginBottom: '1vh',
-              }}
-            />
-          ) : (
-            <Button onClick={() => addContact()}>Salvar</Button>
-          )}
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
+			const sendImage = await api.post(
+				`api/foto/upload/${userData.id}`,
+				formData,
+				{
+					headers: {
+						Accept: ' */*',
+						Authorization: `Bearer ${location.state.data.token}`,
+						'Content-Type': 'multipart/form-data',
+						Origin: 'https://metawaydemo.vps-kinghost.net:8485',
+						Host: 'metawaydemo.vps-kinghost.net:8485',
+					},
+				}
+			);
+
+			idImage = sendImage.data.object.id;
+			const dados = {
+				cpf: cpf,
+				endereco: {
+					bairro: bairro,
+					cep: cep,
+					cidade: cidade,
+					estado: estado,
+					id: id,
+					logradouro: logradouro,
+					numero: numero,
+					pais: pais,
+				},
+				foto: {
+					id: idImage,
+					name: 'foto',
+					type: 'image/jpeg',
+				},
+				id: id,
+				nome: nome,
+			};
+
+			await api.post('api/pessoa/salvar', dados, {
+				headers: {
+					Accept: ' */*',
+					Authorization: `Bearer ${location.state.data.token}`,
+					'Content-Type': 'application/json',
+				},
+			});
+
+			setTimeout(() => {
+				setIsLoading(false);
+				setMsg('Contato criado com sucesso!');
+				setShowMsg(true);
+				setSeverity('success');
+				setOpenModalAdd(false);
+				//window.location.reload(1);
+			}, '2000');
+		} catch (e) {
+			setTimeout(() => {
+				setIsLoading(false);
+
+				setMsg(e.response !== undefined ? e.response.data.error : e);
+				setShowMsg(true);
+				setSeverity('error');
+			}, '2000');
+		}
+	}
+
+	return (
+		<div style={{ display: 'flex', textAlign: 'center', columnCount: '3' }}>
+			{showMsg === true ? (
+				<>
+					<Snackbar
+						open={showMsg}
+						autoHideDuration={6000}
+						onClose={() => setShowMsg(false)}
+					>
+						<Alert severity={severity}>{msg !== '' ? msg : ''}</Alert>
+					</Snackbar>
+				</>
+			) : null}
+			<Dialog
+				open={openModalAdd}
+				onClose={handleClose}
+				style={{
+					display: 'flex',
+					textAlign: 'center',
+					alignSelf: 'center',
+					flexDirection: 'column',
+					columnCount: '3',
+				}}
+				fullWidth
+			>
+				<DialogTitle>Adicionar novo contato.</DialogTitle>
+				<div
+					style={{
+						textAlign: 'center',
+						alignSelf: 'center',
+						flexDirection: 'column',
+						columnCount: 3,
+					}}
+				>
+					<TextField
+						id="outlined-basic"
+						label="ID"
+						variant="outlined"
+						onChange={(e) => setId(e.target.value.replace(/^\D/g, ''))}
+						value={id}
+						style={{ padding: 5 }}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="Nome"
+						variant="outlined"
+						style={{ padding: 5 }}
+						onChange={(e) => setNome(e.target.value)}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="CPF"
+						variant="outlined"
+						value={cpf}
+						onChange={(e) =>
+							setCpf(
+								e.target.value
+									.replace(/\D/g, '')
+									.replace(/(\d{3})(\d)/, '$1.$2')
+									.replace(/(\d{3})(\d)/, '$1.$2')
+									.replace(/(\d{3})(\d{1,2})/, '$1-$2')
+									.replace(/(-\d{2})\d+?$/, '$1')
+							)
+						}
+						style={{ padding: 5 }}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="CEP"
+						variant="outlined"
+						style={{ padding: 5 }}
+						onChange={(e) => onChangeCep(e)}
+						inputProps={{ maxLength: '9' }}
+						onBlur={() => onBlurCep()}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="País"
+						variant="outlined"
+						style={{ padding: 5 }}
+						onChange={(e) => setPais(e.target.value)}
+						value={pais}
+						inputProps={{ maxLength: 2 }}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="Estado"
+						variant="outlined"
+						style={{ padding: 5 }}
+						onChange={(e) => setEstado(e.target.value)}
+						value={estado}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="Cidade"
+						variant="outlined"
+						style={{ padding: 5 }}
+						onChange={(e) => setCidade(e.target.value)}
+						value={cidade}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="Bairro"
+						variant="outlined"
+						style={{ padding: 5 }}
+						onChange={(e) => setBairro(e.target.value)}
+						value={bairro}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="Logradouro"
+						variant="outlined"
+						style={{ padding: 5 }}
+						onChange={(e) => setLogradouro(e.target.value)}
+						value={logradouro}
+					/>
+					<TextField
+						id="outlined-basic"
+						label="Número"
+						variant="outlined"
+						style={{ padding: 5 }}
+						onChange={(e) => {
+							var v = e.target.value.replace(/\D/g, '');
+
+							v = v.replace(/^\D/, '');
+
+							e.target.value = v;
+							setNumero(v);
+						}}
+					/>
+					<br />
+					<input
+						type="file"
+						name="user[image]"
+						onChange={onFileChange}
+						style={{ width: '10vw' }}
+					/>
+				</div>
+
+				<DialogActions>
+					<Button onClick={() => handleClose()}>Cancelar</Button>
+					{isLoading === true ? (
+						<CircularProgress
+							size={22}
+							style={{
+								marginTop: '1vh',
+								marginRight: '1vw',
+								marginLeft: '1vw',
+								marginBottom: '1vh',
+							}}
+						/>
+					) : (
+						<Button onClick={() => addContact()}>Salvar</Button>
+					)}
+				</DialogActions>
+			</Dialog>
+		</div>
+	);
 }
